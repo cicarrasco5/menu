@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cocktails</title>
+  <style>
+    @font-face {
+      font-family: 'Visitor';
+      src: url('fonts/Visitor.otf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    body {
+      font-family: 'Visitor', sans-serif;
+      padding: 20px;
+      background-color: #f8f8f8;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 4rem;
+    }
+
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: calc(33.33% - 10px);
+      max-width: 300px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+
+    .card p {
+      font-weight: bold;
+      font-size: 2rem;
+      text-align: center;
+    }
+
+    .card img {
+      width: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cocktails</h1>
+  <div class="grid" id="imageGrid"></div>
+
+  <script>
+    const imageGrid = document.getElementById('imageGrid');
+    const sheetCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vScDSPdqKoaCXMQqust6yeJbhUcuuT9hXiuCmwQHYKx5yAajv3rtfNs3EZUPKUJv8Xv5Om4wcB01Qyn/pub?gid=0&single=true&output=csv';
+
+    fetch(sheetCSV)
+      .then(res => res.text())
+      .then(csv => {
+        const lines = csv.trim().split('\n').slice(1); // saltar encabezado
+        lines.forEach(row => {
+          const [trago, disponible, foto] = row.split(',');
+
+          if (disponible.trim() === "Sí" && foto.trim() !== "") {
+            const card = document.createElement('div');
+            card.classList.add('card');
+
+            const label = document.createElement('p');
+            label.textContent = trago.trim();
+
+            const img = document.createElement('img');
+            img.src = `images/${foto.trim()}.jpg`;
+            img.alt = trago.trim();
+            img.onerror = () => card.remove();
+
+            card.appendChild(label);
+            card.appendChild(img);
+            imageGrid.appendChild(card);
+          }
+        });
+      })
+      .catch(err => console.error('Error cargando el CSV:', err));
+  </script>
+</body>
+</html>
